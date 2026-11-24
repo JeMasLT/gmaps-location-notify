@@ -1,6 +1,29 @@
-# Google Maps – shared location "Notify me"
+# Google Maps – shared location "Notify me" & "Follow"
 
-A [Tampermonkey](https://www.tampermonkey.net/) userscript for **Google Maps on the web**. In the panel of a person who shares their location with you, it adds a **Notify me** button next to *Directions / Nearby / Hide on map*. When the address shown in that panel changes, the script beeps. Different streets can have different tones.
+A [Tampermonkey](https://www.tampermonkey.net/) userscript for **Google Maps on the web**. In the panel of a person who shares their location with you, it adds two buttons next to *Directions / Nearby / Hide on map*:
+
+- **Notify me**: beeps when the address shown for that person changes. Different streets can have different tones.
+- **Follow**: keeps the map centred on the person as they move.
+
+![Notify me and Follow both switched on](screenshots/follow.png)
+
+## Features
+
+- 🔔 **Notify me** with three modes: off, beep on every address change, or beep only on the streets you choose.
+- 🎵 **Tones per street**: pitch, length and number of beeps for each group of streets (`TONE_RULES`). Matching ignores case and accents.
+- 💬 **Tooltip** on the button listing the current mode and every configured street with its tone.
+- 🎯 **Follow** re-centres the map on the person whenever their address changes. No page reload, and *Notify me* keeps working.
+- 🛑 **Auto-off**: both buttons switch off when you open another person or close the panel.
+- 🧪 [**Tone tester**](tone-tester.html): a standalone page to try out beep settings by ear.
+
+## What's new
+
+| Version | Changes |
+|---|---|
+| **1.2.0** | New **Follow** button: keeps the map centred on the person (re-centres on each address change, at most every `FOLLOW_MIN_INTERVAL_MS`). New settings `FOLLOW_MIN_INTERVAL_MS`, `UI.menuAria` and `UI.followLabel`. |
+| **1.1.0** | First public release: 3-mode **Notify me** button, tones per street (`TONE_RULES`), tooltip with the street list, tone tester page. |
+
+## Notify me modes
 
 | Off | Every address change | Special streets only |
 |---|---|---|
@@ -10,7 +33,7 @@ Hover over the button to see the current mode and the configured streets:
 
 ![Tooltip](screenshots/tooltip.png)
 
-> Screenshots are from real Google Maps, with the person's name, photo, address and other details replaced by fake values (display only). The tooltip is the button's native hover text, redrawn so it shows up in a screenshot.
+> Screenshots are from real Google Maps, with the person's name, photo, address and other details replaced by fake values (display only). The three mode screenshots were taken before the *Follow* button existed. The tooltip is the button's native hover text, redrawn so it shows up in a screenshot.
 
 ## Install
 
@@ -21,6 +44,11 @@ Hover over the button to see the current mode and the configured streets:
 3. Open [Google Maps](https://www.google.com/maps), go to *Location sharing* and click a person.
 
 > Edit the configuration (below) in your installed copy. Tampermonkey's auto-update would overwrite your changes, so turn off *Check for updates* for this script in Tampermonkey after you customise it.
+
+### Updating to a new version
+
+- **Never customised it:** in Tampermonkey's dashboard, open the script and use *Check for updates* (or just open the raw link above again).
+- **Customised it:** copy your `SETTINGS` block (`TONE_RULES`, tones, volume and so on) somewhere safe, install the new version, then paste your settings back. New settings in the new version (see *What's new*) keep their default values.
 
 ## Usage
 
@@ -44,7 +72,7 @@ Each click on the **Notify me** button moves to the next mode:
 
 ### Follow (keep the map centred)
 
-A second button, **Follow** (target icon), keeps the map centred on the person. It is independent of *Notify me*, so you can use either one or both.
+A second button, **Follow** (target icon), keeps the map centred on the person. It is independent of *Notify me*, so you can use either one or both. Off is blue, on is green.
 
 - Click it once: it turns green and centres the map on the person right away. Click again to turn it off.
 - While it's on, the map re-centres each time the person's address changes, at most once every `FOLLOW_MIN_INTERVAL_MS` (10 s by default).
