@@ -42,6 +42,15 @@ Each click on the **Notify me** button moves to the next mode:
   NotifyMeTest('Liepų g. 5, Example City')   // plays the tone this address would get and returns it
   ```
 
+### Follow (keep the map centred)
+
+A second button, **Follow** (target icon), keeps the map centred on the person. It is independent of *Notify me*, so you can use either one or both.
+
+- Click it once: it turns green and centres the map on the person right away. Click again to turn it off.
+- While it's on, the map re-centres each time the person's address changes, at most once every `FOLLOW_MIN_INTERVAL_MS` (10 s by default).
+- Google Maps on the web has no "follow" mode, so the script does what you would do by hand: *Menu → Location sharing → click the person*. The page doesn't reload and *Notify me* keeps working, but you'll see the panel flicker briefly, and the zoom resets to Maps' default for that person.
+- Like *Notify me*, it switches off when you open another person or close the panel.
+
 ## Configuration
 
 The settings are in the `SETTINGS` block at the top of the script:
@@ -58,18 +67,21 @@ const TONE_RULES = [
 
 const VOLUME = 0.3;         // 0.0 – 1.0
 const GAP_MS = 150;         // pause between repeated beeps
-const PANEL_LOST_MS = 3000; // panel gone this long -> notifications switch off
+const PANEL_LOST_MS = 3000; // panel gone this long -> everything switches off
+const FOLLOW_MIN_INTERVAL_MS = 10000; // Follow re-centres the map at most this often
 
 // Google Maps UI texts (English UI). Change these if Maps is in another language.
 const UI = {
   hideOnMapAria: 'Hide on map',
   addressAria: 'Address',
+  menuAria: 'Menu',
   buttonLabel: 'Notify me',
+  followLabel: 'Follow',
 };
 ```
 
 - **`TONE_RULES`**: replace the example streets with your own. `'Liepų'` matches `Liepų g. 12`, `LIEPU G. 12` and so on. Add more rules to give other streets a different tone.
-- **`UI`**: the script finds the panel through Google's `aria-label` texts. If your Google Maps is not in English, set `hideOnMapAria` and `addressAria` to the labels your language uses (find them in DevTools: right-click the *Hide on map* button → *Inspect*).
+- **`UI`**: the script finds the panel through Google's `aria-label` texts. If your Google Maps is not in English, set `hideOnMapAria`, `addressAria` and `menuAria` to the labels your language uses (find them in DevTools: right-click the *Hide on map* button → *Inspect*).
 
 ## Tone tester
 
@@ -80,6 +92,7 @@ const UI = {
 - **The Maps tab must stay open.** The script only runs inside the Google Maps page in your browser. It is not a background service and sends no push notifications.
 - **Background tabs are throttled.** Browsers slow down timers in background tabs, and Maps may refresh the location less often there, so a beep can come late. A separate, visible Maps window works best.
 - **It depends on Google Maps' page structure.** It looks for the *Hide on map* button and the *Address* icon by their `aria-label`. If Google changes the page, the button may disappear until the selectors are updated.
+- **Follow drives the Maps UI.** It opens *Menu → Location sharing* and clicks the person, so it depends on that menu item and list. If Maps changes them, re-centring fails and a `[NotifyMe] Re-centre failed: …` line appears in the console.
 - **The address is the one Maps shows.** It's a street-level text, not exact coordinates, so small moves may not change it, and the address can jump between neighbouring streets.
 
 ## Disclaimer
